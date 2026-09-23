@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import PriceLookup from './pages/PriceLookup'
-import Clients from './pages/Clients'
+import Customers from './pages/Customers'
 import Products from './pages/Products'
 
 const TABS = [
   { id: 'prices', label: 'Price Lookup' },
-  { id: 'clients', label: 'Clients' },
+  { id: 'customers', label: 'Customers' },
   { id: 'products', label: 'Products' },
 ]
 
@@ -44,9 +44,9 @@ export default function App() {
         </div>
       </nav>
 
-      <main className="max-w-6xl mx-auto px-4 py-6 pb-safe" style={{paddingBottom:'max(1.5rem, env(safe-area-inset-bottom))'}}>
+      <main className="max-w-6xl mx-auto px-4 py-6" style={{paddingBottom:'max(1.5rem, env(safe-area-inset-bottom))'}}>
         {tab === 'prices' && <PriceLookup />}
-        {tab === 'clients' && <Clients />}
+        {tab === 'customers' && <Customers />}
         {tab === 'products' && <Products />}
       </main>
     </div>
