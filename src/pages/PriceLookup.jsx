@@ -4,55 +4,74 @@ import { supabase } from '../lib/supabase'
 function SearchSelect({ label, options, value, onChange, placeholder }) {
   const [search, setSearch] = useState('')
   const [open, setOpen] = useState(false)
+  const inputRef = useRef()
   const ref = useRef()
   const selectedName = options.find(o => o.id === value)?.name || ''
 
   useEffect(() => {
-    const handler = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    const handler = e => { if (ref.current && !ref.current.contains(e.target)) { setOpen(false); setSearch('') } }
     document.addEventListener('pointerdown', handler)
     return () => document.removeEventListener('pointerdown', handler)
   }, [])
 
   const filtered = options.filter(o =>
     o.name.toLowerCase().includes(search.toLowerCase())
-  ).slice(0, 50)
+  ).slice(0, 80)
 
   const handleSelect = (id) => { onChange(id); setSearch(''); setOpen(false) }
-  const handleClear = (e) => { e.stopPropagation(); onChange(''); setSearch('') }
+  const handleClear = (e) => { e.stopPropagation(); onChange(''); setSearch(''); inputRef.current?.focus() }
 
   return (
     <div ref={ref} className="relative">
-      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{label}</label>
-      <div className={`flex items-center border rounded-lg bg-white transition-all ${open ? 'border-blue-500 ring-2 ring-blue-100' : 'border-gray-300 hover:border-gray-400'}`}>
-        <input
-          className="flex-1 px-3 py-3 text-base bg-transparent outline-none"
-          placeholder={value ? selectedName : placeholder}
-          value={open ? search : (value ? selectedName : '')}
-          onFocus={() => { setOpen(true); setSearch('') }}
-          onChange={e => { setSearch(e.target.value); setOpen(true) }}
-        />
-        {value && (
-          <button onClick={handleClear} className="px-2 text-gray-400 hover:text-gray-600">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <label className="block text-sm font-semibold text-gray-600 mb-2">{label}</label>
+
+      {/* Selected value chip */}
+      {value && (
+        <div className="flex items-center gap-2 mb-2">
+          <div className="flex-1 flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-xl px-4 py-2.5 min-w-0">
+            <svg className="w-4 h-4 text-blue-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <span className="text-blue-800 font-semibold text-sm truncate">{selectedName}</span>
+          </div>
+          <button
+            onPointerDown={handleClear}
+            className="flex-shrink-0 p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
-        )}
-        <div className="px-2 text-gray-400">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
         </div>
+      )}
+
+      {/* Search input */}
+      <div className={`flex items-center border-2 rounded-xl bg-white transition-all ${open ? 'border-blue-500 shadow-md' : 'border-gray-200 hover:border-gray-300'}`}>
+        <svg className="w-5 h-5 text-gray-400 ml-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          ref={inputRef}
+          className="flex-1 px-3 py-4 text-base bg-transparent outline-none placeholder-gray-400"
+          placeholder={value ? `Search to change ${label.toLowerCase()}...` : placeholder}
+          value={search}
+          onFocus={() => setOpen(true)}
+          onChange={e => { setSearch(e.target.value); setOpen(true) }}
+        />
       </div>
+
       {open && (
-        <ul className="absolute z-30 w-full bg-white border border-gray-200 rounded-lg shadow-xl mt-1 max-h-64 overflow-y-auto" style={{WebkitOverflowScrolling:'touch'}}>
+        <ul
+          className="absolute z-30 w-full bg-white border border-gray-200 rounded-xl shadow-2xl mt-1.5 overflow-y-auto"
+          style={{ maxHeight: '55vh', WebkitOverflowScrolling: 'touch' }}
+        >
           {filtered.length === 0 ? (
-            <li className="px-3 py-2 text-sm text-gray-400 italic">No results</li>
+            <li className="px-4 py-4 text-sm text-gray-400 italic text-center">No results for "{search}"</li>
           ) : filtered.map(o => (
             <li
               key={o.id}
               onPointerDown={() => handleSelect(o.id)}
-              className={`px-3 py-3 text-sm cursor-pointer hover:bg-blue-50 active:bg-blue-100 ${o.id === value ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'}`}
+              className={`px-4 py-3.5 text-sm cursor-pointer border-b border-gray-50 last:border-0 hover:bg-blue-50 active:bg-blue-100 transition-colors ${o.id === value ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-700'}`}
             >
               {o.name}
             </li>
@@ -175,8 +194,8 @@ export default function PriceLookup() {
           <h2 className="text-white font-semibold text-lg">Price Lookup</h2>
           <p className="text-blue-200 text-sm">Select a customer and/or product to find agreed prices</p>
         </div>
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="p-6 md:p-8">
+          <div className="flex flex-col gap-5">
             <SearchSelect
               label="Customer"
               options={customers}
