@@ -9,8 +9,8 @@ function SearchSelect({ label, options, value, onChange, placeholder }) {
 
   useEffect(() => {
     const handler = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
+    document.addEventListener('pointerdown', handler)
+    return () => document.removeEventListener('pointerdown', handler)
   }, [])
 
   const filtered = options.filter(o =>
@@ -36,7 +36,7 @@ function SearchSelect({ label, options, value, onChange, placeholder }) {
         className={`flex items-center border rounded-lg bg-white transition-all ${open ? 'border-blue-500 ring-2 ring-blue-100' : 'border-gray-300 hover:border-gray-400'}`}
       >
         <input
-          className="flex-1 px-3 py-2.5 text-sm bg-transparent outline-none"
+          className="flex-1 px-3 py-3 text-base bg-transparent outline-none"
           placeholder={value ? selectedName : placeholder}
           value={open ? search : (value ? selectedName : '')}
           onFocus={() => { setOpen(true); setSearch('') }}
@@ -56,14 +56,14 @@ function SearchSelect({ label, options, value, onChange, placeholder }) {
         </div>
       </div>
       {open && (
-        <ul className="absolute z-30 w-full bg-white border border-gray-200 rounded-lg shadow-xl mt-1 max-h-64 overflow-y-auto">
+        <ul className="absolute z-30 w-full bg-white border border-gray-200 rounded-lg shadow-xl mt-1 max-h-64 overflow-y-auto" style={{WebkitOverflowScrolling:'touch'}}>
           {filtered.length === 0 ? (
             <li className="px-3 py-2 text-sm text-gray-400 italic">No results</li>
           ) : filtered.map(o => (
             <li
               key={o.id}
-              onMouseDown={() => handleSelect(o.id)}
-              className={`px-3 py-2 text-sm cursor-pointer hover:bg-blue-50 ${o.id === value ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'}`}
+              onPointerDown={() => handleSelect(o.id)}
+              className={`px-3 py-3 text-sm cursor-pointer hover:bg-blue-50 active:bg-blue-100 ${o.id === value ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'}`}
             >
               {o.name}
             </li>
