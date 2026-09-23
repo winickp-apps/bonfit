@@ -3,8 +3,8 @@
   "short_name": "BONFIT",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f9fafb",
-  "theme_color": "#1e3a5f",
+  "background_color": "#143464",
+  "theme_color": "#143464",
   "icons": [
     {
       "src": "/icon-192.png",
